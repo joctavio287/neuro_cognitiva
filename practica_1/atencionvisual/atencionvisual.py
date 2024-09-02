@@ -16,16 +16,36 @@
 #make sure data are being saved
 
 #####################################################################################3
-# Import libraries
-from psychopy import visual, event, core, data, gui
-import random, os
+import os, random, numpy as np, pandas as pd
+from time import strftime
+from random import  randrange, shuffle
 
-#%% Experimenter input
-dlg = gui.Dlg(title = 'Experiment Parameters')
-dlg.addText('Subejc info*')
-dlg.addField('Subject ID:',initial='1')
-id_inf = dlg.show()
-exp_input = list(id_inf.values())
+# Graphical user interface, visual-related objects, basic functions (timing, quit, etc.), input handler
+from psychopy import  gui, visual, core, event, data
+
+# Funciones auxiliares
+from auxiliary import dump_pickle, dict_to_csv
+
+# ================================================================================================================================================
+# Definimos los parámetros del experimento: se abre un diálogo en el cual se especifícan ID del sujeto, número de experimentos, porcentaje de go's
+# ================================================================================================================================================
+dialogue = gui.Dlg(title='Experiment Parameters')
+dialogue.addText(text='Subejct information')
+dialogue.addField('subject_id', label='Subject ID:*', initial=1)
+dialogue.addField('name', label='Full name (using caps):*', initial='Max Power')
+dialogue.addField('sex', label='Sex:*', choices=['M', 'F', 'NB', 'Rather not answer'])
+dialogue.addField('age', label='Age:*')
+
+dialogue.addText(text='Set-up experimental')
+# TODO HAY BLANCOS?
+dialogue.addText(text='The sequence of each trial is: fixation, cue, probe, answer')
+
+dialogue.addField('experimenter', label='Experimenter full name (using caps; default, Juan Octavio Castro):*', initial='Juan Octavio Castro')
+dialogue.addField('frame_rate', label='Frame rate of system (default, 60 Hz)', initial=60)
+dialogue.addField('fixation_time', label='Fixation time (s) before cue (default, 1):*', initial=1)
+dialogue.addField('cue_time', label='Time (s) the cue is shown (default, .1):*', initial=.1)
+dialogue.addField('probe_time', label='Time (s) the probe is shown (default, .2):*', initial=.2)
+dialogue.addField('response_key', label='Response key (default, space)', initial='space')
 
 #%%  Defino parametros
 info = {} #a dictionary
@@ -35,17 +55,17 @@ info['participant'] = exp_input[0]
 info['fixTime'] = 1 # sec
 info['cueTime'] = 0.1 # sec
 info['probeTime'] = 0.2 # sec
-info['dateStr'] = data.getDateStr() #will create str of current date/time
+info['dateStr'] = data.getDateStr(format=r'%Y-%m-%d_%H:%M:%S') #will create str of current date/time
 frs = 90
 response_key = {'left','right'}     # Tecla de respuesta
 
 #%% Datos de salida
-filename = os.path.join(os.path.normpath('C:\repos\neuro_cognitiva\practica_1\atencionvisual'), info['participant'] + "_" + info['dateStr'])
+filename = os.path.join(os.path.normpath(r'C:\repos\neuro_cognitiva\practica_1\atencionvisual'), f"participante_{info['participant']}_{info['dateStr']}")
 
 
 #%% Genera la ventana
-# win = visual.Window(size=[2880, 1800], color=[-1,-1,-1], screen = 0, fullscr = True, allowStencil = True)
-win = visual.Window(size=[1400, 800], color=[-1,-1,-1], screen = 0, fullscr = True, allowStencil = True)
+# win = visual.Window(size=[2880, 1800], color=[-1,-1,-1], screen = 0, fullscr = False, allowStencil = True)
+win = visual.Window(size=[1400, 800], color=[-1,-1,-1], screen = 0, fullscr = False, allowStencil = True)
 
 # win.setMouseVisible(False)
 fontsize=0.15

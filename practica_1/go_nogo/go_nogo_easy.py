@@ -30,7 +30,6 @@ dialogue.addField('first_blank_number_of_frames', label='Blank number of frames 
 dialogue.addField('second_blank_number_of_frames', label='Blank number of frames after stimulus (default, 1):*', initial=1)
 dialogue.addField('response_key', label='Response key (default, space)', initial='space')
 
-
 # Se abre la ventana de diálogo con todas los campos que especificamos más arriba. El objeto que se guarda es un diccionario con toda la información
 experiment_information = dialogue.show()
 
