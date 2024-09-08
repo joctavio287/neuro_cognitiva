@@ -1,4 +1,7 @@
-import pickle, os, csv
+import pickle, os, csv, numpy as np
+from random import shuffle
+
+from psychopy import  gui, visual, core, event
 
 def load_pickle(path:str):
     """Loads pickle file
@@ -95,3 +98,129 @@ def dict_to_csv(path:str, obj:dict, rewrite:bool=False, verbose:bool=False):
             print(f'Atention: file overwritten in {path}')
     except:
         raise Exception("Something went wrong when saving")
+
+def all_possible_combinations(a:list):
+    """Make a list with all possible combinations of the elements on a list
+
+    Parameters
+    ----------
+    a : list
+        The list of elements to be combined
+
+    Returns
+    -------
+    list
+        list of lists with all possible combinations of the elements of the list
+    """
+    if len(a) == 0:
+        return [[]]
+    cs = []
+    for c in all_possible_combinations(a[1:]):
+        cs += [c, c+[a[0]]]
+    return cs
+
+def stimuli_sequence(input_data:dict, number_of_trials:int, go_percentage:float, go_label:str, nogo_label:str):
+    """Creates a stimuli sequence given a dictionary with words classified by binary categories (there should be as many groups as twice the number of categories), given it's labels.
+
+    Parameters
+    ----------
+    input_data : dict
+        Dictionary of words classified by categories
+    number_of_trials : int
+        Number of words presented in each stimuli sequence
+    go_percentage : float
+        Percentage (over the number of trials) that are used as "go" stimuli
+    go_label : str
+        Category used as "go"
+    nogo_label : str
+        Category used as "nogo"
+
+
+    Returns
+    -------
+    list
+        Shuffled sequence of words chose according to parameters passed
+    """
+    # Calculamos el número de samples que serán de tipo go
+    number_of_go_samples = int((number_of_trials*go_percentage)/100)
+
+    # Elegimos aleatoriamente tantas palabras como sean necesarias
+    stimuli_sequence = np.random.choice(
+                                    a=input_data[go_label], 
+                                    size=number_of_go_samples,
+                                    replace=False
+                                        ).tolist()
+    stimuli_sequence += np.random.choice(
+                                    a=input_data[nogo_label], 
+                                    size=number_of_trials-number_of_go_samples,
+                                    replace=False
+                                        ).tolist()
+    # Los mezclamos 
+    shuffle(stimuli_sequence)
+    return stimuli_sequence
+
+def routine(input_data:dict, 
+            number_of_trials:int, 
+            go_percentage:float, 
+            go_label:str, 
+            nogo_label:str,
+            win:visual.window.Window,
+            fontsize:float=.15): 
+
+    # Creates the stimuli sequence    
+    stimuli_sequence_training = stimuli_sequence(
+                                                input_data=input_data,
+                                                number_of_trials=number_of_trials,
+                                                go_percentage=go_percentage,
+                                                go_label=go_label,
+                                                nogo_label=nogo_label
+                                                )
+    
+    # Creamos la pantalla de instrucciones
+    if 'chic' in go_label:
+        go_instruction_text = f'Presiona la barra espaciadora sólo si la palabra que aparece en la pantalla representa algo chico'
+        nogo_instruction_text = f'Presiona la barra espaciadora sólo si la palabra que aparece en la pantalla representa algo grande'
+    else:
+        go_instruction_text = f'Presiona la barra espaciadora sólo si la palabra que aparece en la pantalla representa algo grande'
+        nogo_instruction_text = f'Presiona la barra espaciadora sólo si la palabra que aparece en la pantalla representa algo chico'
+    if 'inani' in go_label:
+        go_instruction_text += ' y sin vida.'
+        nogo_instruction_text += ' y con vida.'
+    else:
+        go_instruction_text += ' y con vida.'
+        nogo_instruction_text += ' y sin vida.'
+
+    # Las instrucciones
+    instructions_text_training = visual.TextStim(
+                                        win=win,
+                                        text='Presiona la barra espaciadora sólo si la palabra representa algo grande',
+                                        font='Arial',
+                                        height=fontsize,
+                                        color='white',
+                                        anchorHoriz='center',
+                                        anchorVert='center',
+                                        pos=(0.0,0)
+                                        )
+
+    instructions_text_middle = visual.TextStim(
+                                        win=win,
+                                        text='Vamos a repetir el experimento. Presiona la barra para continuar',
+                                        font='Arial',
+                                        height=fontsize,
+                                        color='white',
+                                        anchorHoriz='center',
+                                        anchorVert='center',
+                                        pos=(0.0,0)
+                                        )
+
+    instructions_text_test = visual.TextStim(
+                                        win=win,
+                                        text='Presiona la barra espaciadora sólo si la palabra representa algo chico',
+                                        font='Arial',
+                                        height=fontsize,
+                                        color='white',
+                                        anchorHoriz='center',
+                                        anchorVert='center',
+                                        pos=(0.0,0)
+                                        )
+
