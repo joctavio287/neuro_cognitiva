@@ -16,15 +16,14 @@ palabras = load_pickle(path='practica_1/input_experimento_1/palabras.pkl')
 # ================================================================================================================================================
 dialogue = gui.Dlg(title='Experiment Parameters')
 dialogue.addText(text='Subejct information')
-dialogue.addField('subject_id', label='Subject ID:*', initial=1)
+dialogue.addField('subject_id', label='Subject ID (The code is the first letter of experimenter name and them mumber):*', initial='J1')
 dialogue.addField('name', label='Full name (using caps):*', initial='Max Power')
 dialogue.addField('sex', label='Sex:*', choices=['M', 'F', 'NB', 'Rather not answer'])
 dialogue.addField('age', label='Age:*')
 
 dialogue.addText(text='Set-up experimental')
 dialogue.addText(text='The sequence of each trial is: fixation, blank, stimulus, blank, answer')
-
-dialogue.addField('number_of_trials', label='Número de trials (default, 30):', initial=30)
+dialogue.addField('number_of_trials', label='Número de trials (default, 30. Max available, 32):', initial=30)
 dialogue.addField('go_percentage', label='Porcentaje gos (default, 20):', initial=20)
 dialogue.addField('experimenter', label='Experimenter full name (using caps; default, Juan Octavio Castro):*', initial='Juan Octavio Castro')
 dialogue.addField('frame_rate', label='Frame rate of system (default, 60 Hz)', initial=60)
@@ -35,26 +34,21 @@ dialogue.addField('response_key', label='Response key (default, space)', initial
 # Se abre la ventana de diálogo con todas los campos que especificamos más arriba. El objeto que se guarda es un diccionario con toda la información
 experiment_information = dialogue.show()
 
-# Ni idea que hace esto
-# random.shuffle(experiment_information['pause_duration_in_frames'])
-
-# Creamos el archivo donde vamos a guardar los datos
-output_file_path = f"numTrials_{experiment_information['number_of_trials']}_goPctage_{int(experiment_information['go_percentage'])}"
-output_file_path+= f"_participante_{experiment_information['subject_id']}_{strftime('%d-%m-%Y_%H-%M-%S')}.csv"
+# Creamos los archivos donde vamos a guardar los datos
+file_date = strftime('%d-%m-%Y_%H-%M-%S')
+output_file_path = f"output_participante_{experiment_information['subject_id']}_{file_date}.csv"
 output_file_path = os.path.normpath(os.path.join(
                                                 os.getcwd() + os.path.normpath('/practica_1/output_gonogo/'), 
                                                 os.path.normpath(output_file_path)
                                                 )
                                     )
+metadata_path = os.path.normpath(os.path.join(
+                                            os.getcwd() + os.path.normpath('/practica_1/output_gonogo/'), 
+                                            os.path.normpath(f"info_experimental_participante_{experiment_information['subject_id']}_{file_date}.pkl")
+                                            )
+                                    )
 
-
-# Guardamos un pkl con la información del setup
-dump_pickle(path=output_file_path.replace('.csv', '.pkl'), obj=experiment_information, rewrite=True, verbose=True)
-
-# Abrimos el archivo y ponemos el header
-# output_file = open(output_file_path,'w+') # Suma por linea
-# output_file.write('subject_id,number_of_trials,stim,correct,response_time,cumulative_response_time,fixation_onset,fixation_dur,stimulus_onset,stimulus_duration\n')
-# output_file.flush() # limpia el buffer poniendo todo lo que queda colgado en el archivo
+# Creamos el output file: va a haber un diccionario out por cada categoría binaria. El experimento se repetirá en cada categoría
 out = {key: [] for key in ['trial','stimulus','answer','response_time(s)','cumulative_response_time(s)',\
                                    'fixation_onset','fixation_duration','stimulus_onset','stimulus_duration',\
                                    'check_response_onset', 'response_duration', 'trial_duration']}
@@ -488,3 +482,7 @@ win.close()
 # Guardamos el output
 output = pd.DataFrame(data=output_file, columns=output_file.keys())
 output.columns
+
+
+# Guardamos un pkl con la información del setup
+dump_pickle(path=metadata_path, obj=experiment_information, rewrite=True, verbose=True)
