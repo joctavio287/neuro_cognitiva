@@ -12,6 +12,7 @@ palabras = load_pickle(path='practica_1/input_experimento_1/palabras_doble_categ
 max_data = min([len(palabras[key]) for key in palabras])
 palabras = {key:palabras[key][:max_data] for key in palabras}
 categorias_posibles = [element for element in all_possible_combinations(a=list(palabras.keys())) if len(element)==2]
+random.shuffle(categorias_posibles)
 
 # ================================================================================================================================================
 # Definimos los parámetros del experimento: se abre un diálogo en el cual se especifícan ID del sujeto, número de experimentos, porcentaje de go's
