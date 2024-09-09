@@ -19,7 +19,7 @@ random.shuffle(categorias_posibles)
 # ================================================================================================================================================
 dialogue = gui.Dlg(title='Experiment Parameters')
 dialogue.addText(text='Subejct information')
-dialogue.addField('subject_id', label='Subject ID (The code is the first letter of experimenter name and them mumber):*', initial='J0')
+dialogue.addField('subject_id', label='Subject ID (The code is the first letter of experimenter name and then the number of the subject):*', initial='J0')
 dialogue.addField('name', label='Full name (using caps):*', initial='Juan Octavio Castro')
 dialogue.addField('sex', label='Sex:*', choices=['M', 'F', 'NB', 'Rather not answer'])
 dialogue.addField('age', label='Age:*')
@@ -31,7 +31,7 @@ dialogue.addField('number_of_trials', label='Número de trials (default, 10. Max
 dialogue.addField('go_percentage', label='Porcentaje gos (default, 20):', initial=20)
 dialogue.addField('experimenter', label='Experimenter full name (using caps; default, Juan Octavio Castro):*', initial='Juan Octavio Castro')
 dialogue.addField('frame_rate', label='Frame rate of system (default, 60 Hz)', initial=60)
-dialogue.addField('fixation_number_of_frames', label='Fixation number of fsrames before stimulus (default, 12):*', initial=12)
+dialogue.addField('fixation_number_of_frames', label='Fixation number of frames before stimulus (default, 12):*', initial=12)
 dialogue.addField('first_blank_number_of_frames', label='Blank number of frames previous to the stimulus (default, 3):*', initial=3)
 
 # Se abre la ventana de diálogo con todas los campos que especificamos más arriba. El objeto que se guarda es un diccionario con toda la información
@@ -73,7 +73,7 @@ win = visual.Window(
                     size=[683, 384], # seteando el tamaño en pixeles
                     color=[-1,-1,-1], # rgb, siendo cada uno en el rango -1,1
                     screen=1, # la pantalla física en la cual saldrá el experimento
-                    fullscr=False, 
+                    fullscr=True, 
                     allowGUI=None, # si mostrar botones de cerrado e interacción en la pantalla
                     checkTiming=True, # si calcula el frame rate
                     allowStencil=True # permite poner en el buffer funciones del OpenGL
@@ -213,7 +213,7 @@ for categories in output_file:
     for trial, stimulus in enumerate(stimuli_list):
             
         # Definimos la duración del estímulo en frames
-        stimulus_duration = int(random.gauss(mu=1, sigma=0.2)*experiment_information['frame_rate']) # entre .8 y 1.2 segs aprox
+        stimulus_duration = int(random.gauss(mu=.6, sigma=0.2)*experiment_information['frame_rate']) # entre .6 y 1 segs aprox
         
         # Definimos la duración que tiene el participante para responder
         response_duration = int(random.gauss(mu=1.5, sigma=0.2)*experiment_information['frame_rate']) # entre 1 y 2 segs 
@@ -355,7 +355,7 @@ for categories in output_file:
     for trial, stimulus in enumerate(stimuli_list):
             
         # Definimos la duración del estímulo en frames
-        stimulus_duration = int(random.gauss(mu=.8, sigma=0.2)*experiment_information['frame_rate']) # entre .6 y 1 segs aprox
+        stimulus_duration = int(random.gauss(mu=.6, sigma=0.2)*experiment_information['frame_rate']) # entre .6 y 1 segs aprox
         
         # Definimos la duración que tiene el participante para responder
         response_duration = int(random.gauss(mu=1.5, sigma=0.2)*experiment_information['frame_rate']) # entre 1 y 2 segs 
