@@ -6,7 +6,7 @@ from random import  randrange, shuffle
 from psychopy import  gui, visual, core, event
 
 # Funciones auxiliares
-from auxiliary import dump_pickle, dict_to_csv
+from practica_1.auxiliary import dump_pickle, dict_to_csv
 
 # ================================================================================================================================================
 # Definimos los parámetros del experimento: se abre un diálogo en el cual se especifícan ID del sujeto, número de experimentos, porcentaje de go's

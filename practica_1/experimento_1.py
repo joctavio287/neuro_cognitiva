@@ -6,7 +6,7 @@ from random import  randrange, shuffle
 from psychopy import  gui, visual, core, event
 
 # Funciones auxiliares
-from auxiliary import dump_pickle, dict_to_csv, load_pickle
+from practica_1.auxiliary import dump_pickle, dict_to_csv, load_pickle
 
 # Cargamos las palabras de input del experimento
 palabras = load_pickle(path='practica_1/input_experimento_1/palabras.pkl')
@@ -38,12 +38,12 @@ experiment_information = dialogue.show()
 file_date = strftime('%d-%m-%Y_%H-%M-%S')
 output_file_path = f"output_participante_{experiment_information['subject_id']}_{file_date}.pkl"
 output_file_path = os.path.normpath(os.path.join(
-                                                os.getcwd() + os.path.normpath('/practica_1/output_gonogo/'), 
+                                                os.getcwd() + os.path.normpath('/practica_1/output_experimento_1/'), 
                                                 os.path.normpath(output_file_path)
                                                 )
                                     )
 metadata_path = os.path.normpath(os.path.join(
-                                            os.getcwd() + os.path.normpath('/practica_1/output_gonogo/'), 
+                                            os.getcwd() + os.path.normpath('/practica_1/output_experimento_1/'), 
                                             os.path.normpath(f"info_experimental_participante_{experiment_information['subject_id']}_{file_date}.pkl")
                                             )
                                     )
@@ -99,7 +99,7 @@ win = visual.Window(
                     size=[683, 384], # seteando el tamaño en pixeles
                     color=[-1,-1,-1], # rgb, siendo cada uno en el rango -1,1
                     screen=1, # la pantalla física en la cual saldrá el experimento
-                    fullscr=False, 
+                    fullscr=True, 
                     allowGUI=None, # si mostrar botones de cerrado e interacción en la pantalla
                     checkTiming=True, # si calcula el frame rate
                     allowStencil=True # permite poner en el buffer funciones del OpenGL

@@ -24,7 +24,7 @@ from random import  randrange, shuffle
 from psychopy import  gui, visual, core, event, data
 
 # Funciones auxiliares
-from auxiliary import dump_pickle, dict_to_csv
+from practica_1.auxiliary import dump_pickle, dict_to_csv
 
 # ================================================================================================================================================
 # Definimos los parámetros del experimento: se abre un diálogo en el cual se especifícan ID del sujeto, número de experimentos, porcentaje de go's
@@ -50,7 +50,7 @@ dialogue.addField('response_key', label='Response key (default, space)', initial
 #%%  Defino parametros
 info = {} #a dictionary
 #present dialog to collect info
-info['participant'] = exp_input[0]
+# info['participant'] = exp_input[0]
 #add additional info after the dialog has gone
 info['fixTime'] = 1 # sec
 info['cueTime'] = 0.1 # sec
