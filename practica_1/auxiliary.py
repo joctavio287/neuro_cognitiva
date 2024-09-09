@@ -119,7 +119,7 @@ def all_possible_combinations(a:list):
         cs += [c, c+[a[0]]]
     return cs
 
-def stimuli_sequence(input_data:dict, number_of_trials:int, go_percentage:float, go_label:str, nogo_label:str):
+def stimuli_sequence(input_data:dict, number_of_trials:int, go_percentage:float, go_label:str):
     """Creates a stimuli sequence given a dictionary with words classified by binary categories (there should be as many groups as twice the number of categories), given it's labels.
 
     Parameters
@@ -150,11 +150,17 @@ def stimuli_sequence(input_data:dict, number_of_trials:int, go_percentage:float,
                                     size=number_of_go_samples,
                                     replace=False
                                         ).tolist()
+    # Use the left_over keys
+    categories = [key for key in input_data.keys() if key!= go_label]
+    left_overwords=[]
+    for cat in categories:
+        left_overwords += input_data[cat] 
     stimuli_sequence += np.random.choice(
-                                    a=input_data[nogo_label], 
+                                    a=left_overwords, 
                                     size=number_of_trials-number_of_go_samples,
                                     replace=False
                                         ).tolist()
+
     # Los mezclamos 
     shuffle(stimuli_sequence)
     return stimuli_sequence

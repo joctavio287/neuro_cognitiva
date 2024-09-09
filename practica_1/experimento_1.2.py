@@ -33,7 +33,6 @@ dialogue.addField('experimenter', label='Experimenter full name (using caps; def
 dialogue.addField('frame_rate', label='Frame rate of system (default, 60 Hz)', initial=60)
 dialogue.addField('fixation_number_of_frames', label='Fixation number of fsrames before stimulus (default, 12):*', initial=12)
 dialogue.addField('first_blank_number_of_frames', label='Blank number of frames previous to the stimulus (default, 3):*', initial=3)
-dialogue.addField('response_key', label='Response key (default, space)', initial='space')
 
 # Se abre la ventana de diálogo con todas los campos que especificamos más arriba. El objeto que se guarda es un diccionario con toda la información
 experiment_information = dialogue.show()
@@ -176,8 +175,7 @@ for categories in output_file:
                                     input_data=palabras,
                                     number_of_trials=experiment_information['number_of_trials'],
                                     go_percentage=experiment_information['go_percentage'],
-                                    go_label=go_label,
-                                    nogo_label=nogo_label
+                                    go_label=go_label
                                     )
     stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0)
                                     ) for trial, stimulus in enumerate(stimuli_list)}
@@ -319,8 +317,7 @@ for categories in output_file:
                                     input_data=palabras,
                                     number_of_trials=experiment_information['number_of_trials'],
                                     go_percentage=experiment_information['go_percentage'],
-                                    go_label=go_label,
-                                    nogo_label=nogo_label
+                                    go_label=go_label
                                     )
     stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0)
                                     ) for trial, stimulus in enumerate(stimuli_list)}
@@ -358,7 +355,7 @@ for categories in output_file:
     for trial, stimulus in enumerate(stimuli_list):
             
         # Definimos la duración del estímulo en frames
-        stimulus_duration = int(random.gauss(mu=1, sigma=0.2)*experiment_information['frame_rate']) # entre .8 y 1.2 segs aprox
+        stimulus_duration = int(random.gauss(mu=.8, sigma=0.2)*experiment_information['frame_rate']) # entre .6 y 1 segs aprox
         
         # Definimos la duración que tiene el participante para responder
         response_duration = int(random.gauss(mu=1.5, sigma=0.2)*experiment_information['frame_rate']) # entre 1 y 2 segs 
