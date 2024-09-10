@@ -1,11 +1,12 @@
-import os, random, numpy as np, pandas as pd
+import os, random, numpy as np
 from time import strftime
 
 # Graphical user interface, visual-related objects, basic functions (timing, quit, etc.), input handler
 from psychopy import  gui, visual, core, event
 
 # Funciones auxiliares
-from practica_1.auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
+# from practica_1.auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
+from auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
 
 # Cargamos las palabras de input del experimento
 palabras = load_pickle(path='practica_1/input_experimento_1/palabras_doble_categoria.pkl')
@@ -66,11 +67,6 @@ output_file = {tuple(key):{'train':out, 'test':out} for key in categorias_posibl
 # ===========================
 # Configuramos el experimento
 # ===========================
-# Configuramos la tecla de salida del programa
-event.globalKeys.clear()
-def quit_experiment():
-    core.quit()
-event.globalKeys.add(key='q', func=quit_experiment)
 
 # Inicializamos la pantalla (va a aparecer)
 win = visual.Window(
@@ -82,6 +78,13 @@ win = visual.Window(
                     checkTiming=True, # si calcula el frame rate
                     allowStencil=True # permite poner en el buffer funciones del OpenGL
                     ) 
+
+# # Configuramos la tecla de salida del programa #NO SOLO NO FUNCIONA SINO QUE ROMPE EL CODIGO
+# event.globalKeys.clear()
+# def quit_experiment(w):
+#     w.close()
+#     return
+# event.globalKeys.add(key='q', func=quit_experiment, func_args=win)
 
 # Que no se visualice el mouse y tamaño de la letra
 win.setMouseVisible(False)
@@ -460,7 +463,7 @@ win.close()
 
 
 # Add questionary abput the experiment
-final_dialogue, rate_scale = gui.Dlg(title='Experiment Parameters'), rate_scale = np.arange(1,11).tolist()
+final_dialogue, rate_scale = gui.Dlg(title='Experiment Parameters'), np.arange(1,11).tolist()
 final_dialogue.addField(
                     'length_of_exp', 
                      label='¿Qué tan largo te pareció el experimento?*', 
