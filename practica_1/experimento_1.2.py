@@ -27,7 +27,7 @@ dialogue.addField('age', label='Age:*')
 
 dialogue.addText(text='Set-up experimental')
 dialogue.addText(text='The sequence of each trial is: fixation, blank, stimulus, blank, answer')
-dialogue.addField('number_of_trials', label='Número de trials (default, 10. Max available, 32):', initial=10)
+dialogue.addField('number_of_trials', label='Número de trials (default, 10. Max available, 32):', initial=30)
 dialogue.addField('go_percentage', label='Porcentaje gos (default, 20):', initial=20)
 dialogue.addField('experimenter', label='Experimenter full name (using caps; default, Juan Octavio Castro):*', initial='Juan Octavio Castro')
 dialogue.addField('frame_rate', label='Frame rate of system (default, 60 Hz)', initial=60)
@@ -50,7 +50,11 @@ metadata_path = os.path.normpath(os.path.join(
                                             os.path.normpath(f"info_experimental_participante_{experiment_information['subject_id']}_{file_date}.pkl")
                                             )
                                     )
-
+questionary_path = os.path.normpath(os.path.join(
+                                            os.getcwd() + os.path.normpath('/practica_1/output_experimento_1/'), 
+                                            os.path.normpath(f"questionary_participante_{experiment_information['subject_id']}_{file_date}.pkl")
+                                            )
+                                    )
 # Creamos el output file: va a haber un diccionario out por cada categoría binaria. El experimento se repetirá en cada categoría
 out = {key: [] for key in ['trial','stimulus','answer','response_time(s)','cumulative_response_time(s)',\
                             'fixation_onset','fixation_duration','stimulus_onset','stimulus_duration',\
@@ -454,8 +458,34 @@ win.flip()
 core.wait(secs=3)
 win.close()
 
+
+# Add questionary abput the experiment
+final_dialogue, rate_scale = gui.Dlg(title='Experiment Parameters'), rate_scale = np.arange(1,11).tolist()
+final_dialogue.addField(
+                    'length_of_exp', 
+                     label='¿Qué tan largo te pareció el experimento?*', 
+                     choices=rate_scale
+                    )
+final_dialogue.addField(
+                    'hability', 
+                     label='¿Sentís que tu habilidad para resolver la tarea mejoraba o empeoraba conforme repetías el experimento?*',
+                     choices=['mejoraba', 'empeoraba', 'no cambió']
+                    )
+final_dialogue.addField(
+                    'hability_rate', 
+                     label='Si tuvieras que cuantificar este cambio, ¿qué numero le pondrías?', 
+                     choices=rate_scale
+                    )
+final_dialogue.addField(
+                    'comments', 
+                     label='Cualquier comentario que quieras hacer nos sirve!', 
+                     initial='...'
+                    )
+questionary = final_dialogue.show()
+
 # Guardamos el output
 dump_pickle(path=output_file_path, obj=output_file, rewrite=True, verbose=True)
 
 # Guardamos un pkl con la información del setup
 dump_pickle(path=metadata_path, obj=experiment_information, rewrite=True, verbose=True)
+dump_pickle(path=questionary_path, obj=questionary, rewrite=True, verbose=True)
