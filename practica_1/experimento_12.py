@@ -156,7 +156,7 @@ blank_text = visual.TextStim(
 
 final_text = visual.TextStim(
                             win=win, 
-                            text='Felicitaciones!! ¡Terminaste!',
+                            text='¡¡Felicitaciones!!\n ¡Terminaste!',
                             height=fontsize,
                             font='Arial',
                             color='white',
@@ -489,12 +489,12 @@ final_dialogue.addField(
                     )
 final_dialogue.addField(
                     'hability_rate', 
-                     label='Si tuvieras que cuantificar este cambio, ¿qué numero le pondrías?', 
+                     label='Si tuvieras que cuantificar este cambio, ¿qué número le pondrías?', 
                      choices=rate_scale
                     )
 final_dialogue.addField(
                     'comments', 
-                     label='Cualquier comentario que quieras hacer nos sirve!', 
+                     label='¡Cualquier comentario que quieras hacer nos sirve!', 
                      initial=''
                     )
 questionary = final_dialogue.show()
