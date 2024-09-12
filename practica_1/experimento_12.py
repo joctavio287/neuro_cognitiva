@@ -369,23 +369,50 @@ for categories in output_file:
                                     )
     stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0), color='white'
                                     ) for trial, stimulus in enumerate(stimuli_list)}
+    
     # Las instrucciones específicas de esta rutina
-    instructions_text = visual.TextStim(
+    instructions_text_1 = visual.TextStim(
                                     win=win,
-                                    text=f'Presiona la barra espaciadora sólo si las palabras que vas a ver a continuación representan algo {go_label}.\n\n Apreta la barra cuando estes {genre} para continuar',
+                                    text='Presiona la barra espaciadora sólo si las palabras que vas a ver a continuación representan algo\n',
                                     font='Arial',
                                     height=fontsize,
                                     color='white',
                                     anchorHoriz='center',
                                     anchorVert='center',
-                                    pos=(0.0,0)
+                                    pos=(0.0,0.5)
                                     )
-                                    
+    
+    subgolabel = go_label.split(' en relación con una persona promedio')[0].upper()
+    
+    # Las instrucciones específicas de esta rutina
+    instructions_text_2 = visual.TextStim(
+                                    win=win,
+                                    text=f'{subgolabel}\n\n',
+                                    font='Arial',
+                                    height=fontsize,
+                                    color='yellow',
+                                    anchorHoriz='center',
+                                    anchorVert='center',
+                                    pos=(0.0,-0.1)
+                                    )
+    # Las instrucciones específicas de esta rutina
+    instructions_text_3 = visual.TextStim(
+                                    win=win,
+                                    text=f'en relación con una persona promedio.\n\n Apreta la barra cuando estes {genre} para continuar',
+                                    font='Arial',
+                                    height=fontsize,
+                                    color='white',
+                                    anchorHoriz='center',
+                                    anchorVert='center',
+                                    pos=(0.0,-.45)
+                                    )
     # ==================
     # Empieza la corrida
 
     # Mostramos la introducción
-    instructions_text.draw()
+    instructions_text_1.draw()
+    instructions_text_2.draw()
+    instructions_text_3.draw()
     win.flip() 
     event.waitKeys(keyList='space')
 
