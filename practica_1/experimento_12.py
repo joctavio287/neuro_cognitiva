@@ -5,8 +5,8 @@ from time import strftime
 from psychopy import  gui, visual, core, event
 
 # Funciones auxiliares
-# from practica_1.auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
-from auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
+from practica_1.auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
+# from auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
 
 # Cargamos las palabras de input del experimento
 palabras = load_pickle(path='practica_1/input_experimento_1/palabras_doble_categoria.pkl')
@@ -37,6 +37,7 @@ dialogue.addField('first_blank_number_of_frames', label='Blank number of frames 
 
 # Se abre la ventana de diálogo con todas los campos que especificamos más arriba. El objeto que se guarda es un diccionario con toda la información
 experiment_information = dialogue.show()
+genre = 'listo' if experiment_information['sex']=='M' else 'lista' if experiment_information['sex']=='F' else 'listx'
 
 # Creamos los archivos donde vamos a guardar los datos
 file_date = strftime('%d-%m-%Y_%H-%M-%S')
@@ -113,7 +114,7 @@ fixation = visual.shape.ShapeStim(
 # Una vez que presione la tecla comenzará el experimento
 presentation_text = visual.TextStim(
                                 win=win, 
-                                text='El experimento que estás por realizar dura cerca de 10 minutos, procurá estar en un lugar cómodo y tranquilo.',
+                                text='El experimento que estás por realizar dura cerca de 10 minutos, procurá estar en un lugar cómodo y tranquilo.\n\n Apretá la barra para continuar...',
                                 height=fontsize,
                                 font='Arial',
                                 color='white',
@@ -122,9 +123,9 @@ presentation_text = visual.TextStim(
                                 pos=(0.0,0.0)
                                 )
 
-get_ready_text = visual.TextStim(
+presentation_text_0 = visual.TextStim(
                                 win=win, 
-                                text='Cuando quieras arrancar apretá la barra espaciadora.',
+                                text='Vamos a comenzar. Para pasar entre pantallas apretá la barra espaciadora.',
                                 height=fontsize,
                                 font='Arial',
                                 color='white',
@@ -134,7 +135,7 @@ get_ready_text = visual.TextStim(
                                 )
 instructions_text_middle = visual.TextStim(
                                 win=win, 
-                                text='Vamos de nuevo, esta vez alternaremos una de las categorías (...)',
+                                text='Vamos de nuevo ...',
                                 height=fontsize,
                                 font='Arial',
                                 color='white',
@@ -142,6 +143,17 @@ instructions_text_middle = visual.TextStim(
                                 anchorVert='center',
                                 pos=(0.0,0.0)
                                 )
+blank_text = visual.TextStim(
+                            win=win, 
+                            text='...',
+                            height=fontsize,
+                            font='Arial',
+                            color='white',
+                            anchorHoriz='center',
+                            anchorVert='center',
+                            pos=(0.0,0.0)
+                            )
+
 final_text = visual.TextStim(
                             win=win, 
                             text='Felicitaciones!! ¡Terminaste!',
@@ -161,12 +173,12 @@ final_text = visual.TextStim(
 experiment_clock = core.Clock()
 
 # Mostramos la introducción
-presentation_text.draw()
+presentation_text_0.draw()
 win.flip() # flip the front and back buffers after drawing everything for your frame
 event.waitKeys(keyList='space')
 
 # Ventana de inicialización
-get_ready_text.draw()
+presentation_text.draw()
 win.flip()
 event.waitKeys(keyList='space')
 
@@ -184,15 +196,16 @@ for categories in output_file:
                                     go_percentage=experiment_information['go_percentage'],
                                     go_label=go_label
                                     )
-    stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0)
+    stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0), color='yellow'
                                     ) for trial, stimulus in enumerate(stimuli_list)}
+    
     # Las instrucciones específicas de esta rutina
     instructions_text = visual.TextStim(
                                     win=win,
-                                    text=f'Presiona la barra espaciadora sólo si la palabra representa algo {go_label}',
+                                    text=f'Presiona la barra espaciadora sólo si las palabras que vas a ver a continuación representan algo {go_label}.\n\n Apreta la barra cuando estes {genre} para continuar',
                                     font='Arial',
                                     height=fontsize,
-                                    color='white',
+                                    color='yellow',
                                     anchorHoriz='center',
                                     anchorVert='center',
                                     pos=(0.0,0)
@@ -205,10 +218,10 @@ for categories in output_file:
     win.flip() 
     event.waitKeys(keyList='space')
 
-    # Ventana de inicialización
-    get_ready_text.draw()
-    win.flip()
-    event.waitKeys(keyList='space')
+    # # Ventana de inicialización
+    # get_ready_text.draw()
+    # win.flip()
+    # event.waitKeys(keyList='space')
 
     # Reseteamos el reloj para guardar los tiempos del experimento
     experiment_clock.reset()
@@ -326,15 +339,15 @@ for categories in output_file:
                                     go_percentage=experiment_information['go_percentage'],
                                     go_label=go_label
                                     )
-    stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0)
+    stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0), color='yellow'
                                     ) for trial, stimulus in enumerate(stimuli_list)}
     # Las instrucciones específicas de esta rutina
     instructions_text = visual.TextStim(
                                     win=win,
-                                    text=f'Presiona la barra espaciadora sólo si la palabra representa algo {go_label}',
+                                    text=f'Presiona la barra espaciadora sólo si las palabras que vas a ver a continuación representan algo {go_label}.\n\n Apreta la barra cuando estes {genre} para continuar',
                                     font='Arial',
                                     height=fontsize,
-                                    color='white',
+                                    color='yellow',
                                     anchorHoriz='center',
                                     anchorVert='center',
                                     pos=(0.0,0)
@@ -347,10 +360,10 @@ for categories in output_file:
     win.flip() 
     event.waitKeys(keyList='space')
 
-    # Ventana de inicialización
-    get_ready_text.draw()
-    win.flip()
-    event.waitKeys(keyList='space')
+    # # Ventana de inicialización
+    # get_ready_text.draw()
+    # win.flip()
+    # event.waitKeys(keyList='space')
 
     # Reseteamos el reloj para guardar los tiempos del experimento
     experiment_clock.reset()
@@ -482,7 +495,7 @@ final_dialogue.addField(
 final_dialogue.addField(
                     'comments', 
                      label='Cualquier comentario que quieras hacer nos sirve!', 
-                     initial='...'
+                     initial=''
                     )
 questionary = final_dialogue.show()
 
