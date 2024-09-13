@@ -5,11 +5,12 @@ from time import strftime
 from psychopy import  gui, visual, core, event
 
 # Funciones auxiliares
-# from practica_1.auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
-from auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
+from practica_1.auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
+# from auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
 
 # Cargamos las palabras de input del experimento
 palabras = load_pickle(path='practica_1/input_experimento_1/palabras_doble_categoria.pkl')
+
 max_data = min([len(palabras[key]) for key in palabras])
 palabras = {key:palabras[key][:max_data] for key in palabras}
 categorias_posibles = [element for element in all_possible_combinations(a=list(palabras.keys())) if len(element)==2]
@@ -37,6 +38,7 @@ dialogue.addField('first_blank_number_of_frames', label='Blank number of frames 
 
 # Se abre la ventana de diálogo con todas los campos que especificamos más arriba. El objeto que se guarda es un diccionario con toda la información
 experiment_information = dialogue.show()
+genre = 'listo' if experiment_information['sex']=='M' else 'lista' if experiment_information['sex']=='F' else 'listx'
 
 # Creamos los archivos donde vamos a guardar los datos
 file_date = strftime('%d-%m-%Y_%H-%M-%S')
@@ -113,7 +115,7 @@ fixation = visual.shape.ShapeStim(
 # Una vez que presione la tecla comenzará el experimento
 presentation_text = visual.TextStim(
                                 win=win, 
-                                text='El experimento que estás por realizar dura cerca de 10 minutos, procurá estar en un lugar cómodo y tranquilo.',
+                                text='El experimento que estás por realizar dura cerca de 10 minutos, procurá estar en un lugar cómodo y tranquilo.\n\n Apretá la barra para continuar...',
                                 height=fontsize,
                                 font='Arial',
                                 color='white',
@@ -122,9 +124,9 @@ presentation_text = visual.TextStim(
                                 pos=(0.0,0.0)
                                 )
 
-get_ready_text = visual.TextStim(
+presentation_text_0 = visual.TextStim(
                                 win=win, 
-                                text='Cuando quieras arrancar apretá la barra espaciadora.',
+                                text='Vamos a comenzar. Para pasar entre pantallas apretá la barra espaciadora.',
                                 height=fontsize,
                                 font='Arial',
                                 color='white',
@@ -134,7 +136,7 @@ get_ready_text = visual.TextStim(
                                 )
 instructions_text_middle = visual.TextStim(
                                 win=win, 
-                                text='Vamos de nuevo, esta vez alternaremos una de las categorías (...)',
+                                text='Vamos de nuevo ...',
                                 height=fontsize,
                                 font='Arial',
                                 color='white',
@@ -142,9 +144,20 @@ instructions_text_middle = visual.TextStim(
                                 anchorVert='center',
                                 pos=(0.0,0.0)
                                 )
+blank_text = visual.TextStim(
+                            win=win, 
+                            text='...',
+                            height=fontsize,
+                            font='Arial',
+                            color='white',
+                            anchorHoriz='center',
+                            anchorVert='center',
+                            pos=(0.0,0.0)
+                            )
+
 final_text = visual.TextStim(
                             win=win, 
-                            text='Felicitaciones!! ¡Terminaste!',
+                            text='¡¡Felicitaciones!!\n ¡Terminaste!',
                             height=fontsize,
                             font='Arial',
                             color='white',
@@ -161,12 +174,12 @@ final_text = visual.TextStim(
 experiment_clock = core.Clock()
 
 # Mostramos la introducción
-presentation_text.draw()
+presentation_text_0.draw()
 win.flip() # flip the front and back buffers after drawing everything for your frame
 event.waitKeys(keyList='space')
 
 # Ventana de inicialización
-get_ready_text.draw()
+presentation_text.draw()
 win.flip()
 event.waitKeys(keyList='space')
 
@@ -184,31 +197,59 @@ for categories in output_file:
                                     go_percentage=experiment_information['go_percentage'],
                                     go_label=go_label
                                     )
-    stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0)
+    stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0), color='white'
                                     ) for trial, stimulus in enumerate(stimuli_list)}
+    
     # Las instrucciones específicas de esta rutina
-    instructions_text = visual.TextStim(
+    instructions_text_1 = visual.TextStim(
                                     win=win,
-                                    text=f'Presiona la barra espaciadora sólo si la palabra representa algo {go_label}',
+                                    text='Presiona la barra espaciadora sólo si las palabras que vas a ver a continuación representan algo\n',
                                     font='Arial',
                                     height=fontsize,
                                     color='white',
                                     anchorHoriz='center',
                                     anchorVert='center',
-                                    pos=(0.0,0)
+                                    pos=(0.0,0.5)
+                                    )
+    
+    subgolabel = go_label.split(' en relación con una persona promedio')[0].upper()
+    
+    # Las instrucciones específicas de esta rutina
+    instructions_text_2 = visual.TextStim(
+                                    win=win,
+                                    text=f'{subgolabel}\n\n',
+                                    font='Arial',
+                                    height=fontsize,
+                                    color='yellow',
+                                    anchorHoriz='center',
+                                    anchorVert='center',
+                                    pos=(0.0,-0.1)
+                                    )
+    # Las instrucciones específicas de esta rutina
+    instructions_text_3 = visual.TextStim(
+                                    win=win,
+                                    text=f'en relación con una persona promedio.\n\n Apreta la barra cuando estes {genre} para continuar',
+                                    font='Arial',
+                                    height=fontsize,
+                                    color='white',
+                                    anchorHoriz='center',
+                                    anchorVert='center',
+                                    pos=(0.0,-.45)
                                     )
     # ==================
     # Empieza la corrida
 
     # Mostramos la introducción
-    instructions_text.draw()
+    instructions_text_1.draw()
+    instructions_text_2.draw()
+    instructions_text_3.draw()
     win.flip() 
     event.waitKeys(keyList='space')
 
-    # Ventana de inicialización
-    get_ready_text.draw()
-    win.flip()
-    event.waitKeys(keyList='space')
+    # # Ventana de inicialización
+    # get_ready_text.draw()
+    # win.flip()
+    # event.waitKeys(keyList='space')
 
     # Reseteamos el reloj para guardar los tiempos del experimento
     experiment_clock.reset()
@@ -326,31 +367,59 @@ for categories in output_file:
                                     go_percentage=experiment_information['go_percentage'],
                                     go_label=go_label
                                     )
-    stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0)
+    stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0), color='white'
                                     ) for trial, stimulus in enumerate(stimuli_list)}
+    
     # Las instrucciones específicas de esta rutina
-    instructions_text = visual.TextStim(
+    instructions_text_1 = visual.TextStim(
                                     win=win,
-                                    text=f'Presiona la barra espaciadora sólo si la palabra representa algo {go_label}',
+                                    text='Presiona la barra espaciadora sólo si las palabras que vas a ver a continuación representan algo\n',
                                     font='Arial',
                                     height=fontsize,
                                     color='white',
                                     anchorHoriz='center',
                                     anchorVert='center',
-                                    pos=(0.0,0)
+                                    pos=(0.0,0.5)
+                                    )
+    
+    subgolabel = go_label.split(' en relación con una persona promedio')[0].upper()
+    
+    # Las instrucciones específicas de esta rutina
+    instructions_text_2 = visual.TextStim(
+                                    win=win,
+                                    text=f'{subgolabel}\n\n',
+                                    font='Arial',
+                                    height=fontsize,
+                                    color='yellow',
+                                    anchorHoriz='center',
+                                    anchorVert='center',
+                                    pos=(0.0,-0.1)
+                                    )
+    # Las instrucciones específicas de esta rutina
+    instructions_text_3 = visual.TextStim(
+                                    win=win,
+                                    text=f'en relación con una persona promedio.\n\n Apreta la barra cuando estes {genre} para continuar',
+                                    font='Arial',
+                                    height=fontsize,
+                                    color='white',
+                                    anchorHoriz='center',
+                                    anchorVert='center',
+                                    pos=(0.0,-.45)
                                     )
     # ==================
     # Empieza la corrida
 
     # Mostramos la introducción
-    instructions_text.draw()
+    instructions_text_1.draw()
+    instructions_text_2.draw()
+    instructions_text_3.draw()
     win.flip() 
     event.waitKeys(keyList='space')
 
-    # Ventana de inicialización
-    get_ready_text.draw()
-    win.flip()
-    event.waitKeys(keyList='space')
+    # # Ventana de inicialización
+    # get_ready_text.draw()
+    # win.flip()
+    # event.waitKeys(keyList='space')
 
     # Reseteamos el reloj para guardar los tiempos del experimento
     experiment_clock.reset()
@@ -476,13 +545,14 @@ final_dialogue.addField(
                     )
 final_dialogue.addField(
                     'hability_rate', 
-                     label='Si tuvieras que cuantificar este cambio, ¿qué numero le pondrías?', 
-                     choices=rate_scale
+                     label='Si tuvieras que cuantificar este cambio, ¿qué número le pondrías? (en caso de responder "no cambió" poner 0)', 
+                     choices=[0]+rate_scale,
+                     initial=0
                     )
 final_dialogue.addField(
                     'comments', 
-                     label='Cualquier comentario que quieras hacer nos sirve!', 
-                     initial='...'
+                     label='¡Cualquier comentario que quieras hacer nos sirve!', 
+                     initial=''
                     )
 questionary = final_dialogue.show()
 
