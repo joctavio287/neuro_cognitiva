@@ -59,12 +59,12 @@ questionary_path = os.path.normpath(os.path.join(
                                             )
                                     )
 # Creamos el output file: va a haber un diccionario out por cada categoría binaria. El experimento se repetirá en cada categoría
-out = {key: [] for key in ['trial','stimulus','answer','response_time(s)','cumulative_response_time(s)',\
+feature_list = ['trial','stimulus','answer','response_time(s)','cumulative_response_time(s)',\
                             'fixation_onset','fixation_duration','stimulus_onset','stimulus_duration',\
-                            'check_response_onset', 'response_duration', 'trial_duration']}
+                            'check_response_onset', 'response_duration', 'trial_duration']
 
 # Las categorías estarán ordenadas por tuplas de la pinta [go, nogo]
-output_file = {tuple(key):{'train':out, 'test':out} for key in categorias_posibles}
+output_file = {tuple(key):{'train':{key: [] for key in feature_list}, 'test':{key: [] for key in feature_list}} for key in categorias_posibles}
 
 # ===========================
 # Configuramos el experimento
