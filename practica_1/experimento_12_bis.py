@@ -14,6 +14,7 @@ palabras = load_pickle(path='practica_1/input_experimento_1/palabras_doble_categ
 max_data = min([len(palabras[key]) for key in palabras])
 palabras = {key:palabras[key][:max_data] for key in palabras}
 categorias_posibles = [element for element in all_possible_combinations(a=list(palabras.keys())) if len(element)==2]
+categorias_posibles = [[element[1], element[0]] for element in categorias_posibles]
 
 random.shuffle(categorias_posibles)
 
