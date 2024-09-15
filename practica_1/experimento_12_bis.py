@@ -14,6 +14,7 @@ palabras = load_pickle(path='practica_1/input_experimento_1/palabras_doble_categ
 max_data = min([len(palabras[key]) for key in palabras])
 palabras = {key:palabras[key][:max_data] for key in palabras}
 categorias_posibles = [element for element in all_possible_combinations(a=list(palabras.keys())) if len(element)==2]
+categorias_posibles = [[element[1], element[0]] for element in categorias_posibles]
 
 random.shuffle(categorias_posibles)
 
@@ -43,7 +44,7 @@ genre = 'listo' if experiment_information['sex']=='M' else 'lista' if experiment
 
 # Creamos los archivos donde vamos a guardar los datos
 file_date = strftime('%d-%m-%Y_%H-%M-%S')
-output_file_path = f"output_participante_{experiment_information['subject_id']}_{file_date}.pkl"
+output_file_path = f"output_participante_{experiment_information['subject_id']}_{file_date}_bis.pkl"
 output_file_path = os.path.normpath(os.path.join(
                                                 os.getcwd() + os.path.normpath('/practica_1/output_experimento_1/'), 
                                                 os.path.normpath(output_file_path)
@@ -51,14 +52,15 @@ output_file_path = os.path.normpath(os.path.join(
                                     )
 metadata_path = os.path.normpath(os.path.join(
                                             os.getcwd() + os.path.normpath('/practica_1/output_experimento_1/'), 
-                                            os.path.normpath(f"info_experimental_participante_{experiment_information['subject_id']}_{file_date}.pkl")
+                                            os.path.normpath(f"info_experimental_participante_{experiment_information['subject_id']}_{file_date}_bis.pkl")
                                             )
                                     )
 questionary_path = os.path.normpath(os.path.join(
                                             os.getcwd() + os.path.normpath('/practica_1/output_experimento_1/'), 
-                                            os.path.normpath(f"questionary_participante_{experiment_information['subject_id']}_{file_date}.pkl")
+                                            os.path.normpath(f"questionary_participante_{experiment_information['subject_id']}_{file_date}_bis.pkl")
                                             )
                                     )
+
 # Creamos el output file: va a haber un diccionario out por cada categoría binaria. El experimento se repetirá en cada categoría
 feature_list = ['trial','stimulus','answer','response_time(s)','cumulative_response_time(s)',\
                             'fixation_onset','fixation_duration','stimulus_onset','stimulus_duration',\

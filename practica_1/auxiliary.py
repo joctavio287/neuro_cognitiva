@@ -1,7 +1,8 @@
 import pickle, os, csv, numpy as np, random
 from random import shuffle
 
-import psychopy as psy
+# import psychopy as psy
+from psychopy import visual, event, clock
 
 def load_pickle(path:str):
     """Loads pickle file
@@ -169,9 +170,9 @@ def routine(experiment_information:dict,
             input_data:dict, 
             go_label:str,
             nogo_label:str,
-            win:psy.visual.window.Window,
-            experiment_clock:psy.clock.Clock,# TODO LLENAR CLASE
-            fixation:psy.visual.shape.ShapeStim, # TODO LLENAR CLASE
+            win:visual.window.Window,
+            experiment_clock:clock.Clock,# TODO LLENAR CLASE
+            fixation:visual.shape.ShapeStim, # TODO LLENAR CLASE
             fontsize:float=.15,
             ):
     # Este es el diccionario donde va a ir el output
@@ -183,7 +184,7 @@ def routine(experiment_information:dict,
     # Creamos los títulos de las instrucciones y los hiperparámetros de la corrida
     # El título
     # Una vez que presione la tecla comenzará el experimento
-    get_ready_text = psy.visual.TextStim(
+    get_ready_text = visual.TextStim(
                                     win=win, 
                                     text='Presione la barra para continuar',
                                     height=fontsize,
@@ -202,13 +203,13 @@ def routine(experiment_information:dict,
                                     go_label=go_label,
                                     nogo_label=nogo_label
                                     )
-    stimuli = {trial:psy.visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0)
+    stimuli = {trial:visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0)
                                     ) for trial, stimulus in enumerate(stimuli_list)}
     stimuli={}
     for trial, stimulus in enumerate(stimuli_list):
-        stimuli[trial] = psy.visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0))
+        stimuli[trial] = visual.TextStim(win=win, text=stimulus, font='Arial', height=fontsize, anchorHoriz='center', anchorVert='center', pos=(.0,.0))
     # Las instrucciones específicas de esta rutina
-    instructions_text = psy.visual.TextStim(
+    instructions_text = visual.TextStim(
                                     win=win,
                                     text=f'Presiona la barra espaciadora sólo si la palabra representa algo {go_label}',
                                     font='Arial',
@@ -224,12 +225,12 @@ def routine(experiment_information:dict,
     # Mostramos la introducción
     instructions_text.draw()
     win.flip() 
-    psy.event.waitKeys(keyList='space')
+    event.waitKeys(keyList='space')
 
     # Ventana de inicialización
     get_ready_text.draw()
     win.flip()
-    psy.event.waitKeys(keyList='space')
+    event.waitKeys(keyList='space')
 
     # Reseteamos el reloj para guardar los tiempos del experimento
     experiment_clock.reset()
@@ -265,7 +266,7 @@ def routine(experiment_information:dict,
             win.flip()
         
         # Borramos todos los eventos que ya hayan sucedido
-        psy.event.clearEvents(eventType=None)
+        event.clearEvents(eventType=None)
 
         # Inicializamos la respuesta como falsa
         already_responded = False
@@ -285,7 +286,7 @@ def routine(experiment_information:dict,
             # Si no respondió
             if not already_responded:
                 # Obtenemos todos los eventos
-                response = psy.event.getKeys(keyList='space', timeStamped=True)
+                response = event.getKeys(keyList='space', timeStamped=True)
 
                 # Si la lista es mayor que cero, respondió
                 if len(response) > 0:
