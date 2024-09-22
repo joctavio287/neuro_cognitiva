@@ -1,23 +1,20 @@
 import os, numpy as np, pandas as pd, matplotlib.pyplot as plt, re, seaborn as sns
-from scipy.stats import ttest_ind
+from scipy.stats import wilcoxon
+import starbars
 
 # Funciones auxiliares
 from practica_1.auxiliary import dump_pickle, load_pickle
 # from auxiliary import dump_pickle, load_pickle, all_possible_combinations, stimuli_sequence
 
+# =========
+# Read data
 # Get the file names
 info_files = [arch for arch in os.listdir('practica_1/output_experimento_1') if 'info_experimental' in arch]
 output_files = [arch for arch in os.listdir('practica_1/output_experimento_1') if 'output_participante' in arch]
-questionary_files = [arch for arch in os.listdir('practica_1/output_experimento_1') if 'quest' in arch]
 
 # Identify subjects that have performed the two parts of the experiment
 subjects_with_bis = [re.search(pattern='([A-Z][0-9]+)', string=file).group() for file in info_files if file.endswith('bis.pkl')]
-files_bis = {subj:{} for subj in subjects_with_bis}
-files = {subj:{} for subj in subjects_with_bis}
-# for file in info_files:
-    # subj_id = re.search(pattern='([A-Z][0-9]+)', string=file).group()
-    # if subj_id in subjects_with_bis:
-#         subj_id, load_pickle(path=os.path.join('practica_1/output_experimento_1/', file))['name']
+files, files_bis = {subj:{} for subj in subjects_with_bis},{subj:{} for subj in subjects_with_bis}
 
 # Iterate over subjects and load dictionaries
 for out_file in output_files:
@@ -31,6 +28,8 @@ for out_file in output_files:
 # Combine data to get one dictionary containing data from both experiments
 data = {subj: files[subj]|files_bis[subj] for subj in files}
 
+# =================================
+# Split experiments into categories
 # Iterate to get relevant data
 results = {}
 for subject in data:
@@ -54,10 +53,10 @@ for subject in data:
                                 'size_living':{'response_time':[], 'answers':[]}
                                 },
                         'test':{
-                        'living':{'response_time':[], 'answers':[]},
-                        'size':{'response_time':[], 'answers':[]}, 
-                        'size_living':{'response_time':[], 'answers':[]}
-                        }
+                                'living':{'response_time':[], 'answers':[]},
+                                'size':{'response_time':[], 'answers':[]}, 
+                                'size_living':{'response_time':[], 'answers':[]}
+                                }
                         }
     for experiment in living:
         results[subject]['train']['living']['response_time'] += data[subject][experiment]['train']['response_time(s)']
@@ -75,7 +74,9 @@ for subject in data:
         results[subject]['train']['size_living']['answers'] += data[subject][experiment]['train']['answer']
         results[subject]['test']['size_living']['answers'] += data[subject][experiment]['test']['answer']
 
-# Get averages across subjects    
+# ======================================
+# Get relevant data in terms of subjects
+# Averages across subjects    
 def check_answer(answer:list):
     # check number of correct answers
     answer = np.array(answer)
@@ -86,15 +87,16 @@ def check_answer(answer:list):
 train_RT_living = []
 train_RT_size = []
 train_RT_size_living = []
+test_RT_living = []
+test_RT_size = []
+test_RT_size_living = []
+
 train_counts_living_correct = []
 train_counts_living_incorrect = []
 train_counts_size_correct = []
 train_counts_size_incorrect = []
 train_counts_size_living_correct = []
 train_counts_size_living_incorrect = []
-test_RT_living = []
-test_RT_size = []
-test_RT_size_living = []
 test_counts_living_correct = []
 test_counts_living_incorrect = []
 test_counts_size_correct = []
@@ -103,6 +105,7 @@ test_counts_size_living_correct = []
 test_counts_size_living_incorrect = []
 
 for subj in results:
+    # Removing nans
     train_RT_living.append(np.array(results[subj]['train']['living']['response_time'])[~np.isnan(np.array(results[subj]['train']['living']['response_time']))])
     train_RT_size.append(np.array(results[subj]['train']['size']['response_time'])[~np.isnan(np.array(results[subj]['train']['size']['response_time']))])
     train_RT_size_living.append(np.array(results[subj]['train']['size_living']['response_time'])[~np.isnan(np.array(results[subj]['train']['size_living']['response_time']))])
@@ -126,48 +129,99 @@ for subj in results:
 
 #======================================================================================
 # Violin plot to compare distribution of response time across categories and train/test
-total = (np.array(train_counts_living_correct)+np.array(train_counts_living_incorrect))/100
+# Arange data according to train, test and category
+total = (np.array(train_counts_living_correct)+np.array(train_counts_living_incorrect))
 data = {
-    'Categoría': ['Vida' for i in range(len(train_counts_living_incorrect))]+['Tamaño' for i in range(len(train_counts_living_incorrect))]+['Ambas' for i in range(len(train_counts_living_incorrect))],
-    'Entrenamiento': (np.array(train_counts_living_correct)/total).tolist()+(np.array(train_counts_size_correct)/total).tolist()+(np.array(train_counts_size_living_correct)/total).tolist(),
-    'Evaluación': (np.array(test_counts_living_correct)/total).tolist()+(np.array(test_counts_size_correct)/total).tolist()+(np.array(test_counts_size_living_correct)/total).tolist()
+        'Categoría': ['Vida' for i in range(len(train_counts_living_incorrect))]+['Tamaño' for i in range(len(train_counts_living_incorrect))]+['Ambas' for i in range(len(train_counts_living_incorrect))],
+        'Entrenamiento': (np.array(train_counts_living_correct)/total).tolist()+(np.array(train_counts_size_correct)/total).tolist()+(np.array(train_counts_size_living_correct)/total).tolist(),
+        'Evaluación': (np.array(test_counts_living_correct)/total).tolist()+(np.array(test_counts_size_correct)/total).tolist()+(np.array(test_counts_size_living_correct)/total).tolist()
         }
-
-# # Compute t-test for each category
-
-# #LIVING
-# test_living = ttest_ind(np.array(train_RT_living), np.array(test_RT_living), equal_var=False)
-# test_living.confidence_interval()
-plt.figure(tight_layout=True, figsize=(6,4))
-
-# load into a dataframe
+# load into a dataframe and use melt to blend columns into rows (opposite of pivot, actually)
 df = pd.DataFrame.from_dict(data)
+pdf = df.melt(
+            id_vars=['Categoría'], 
+            value_vars=['Entrenamiento', 'Evaluación'], 
+            var_name='Etapa', 
+            value_name='Respuestas correctas [%]'
+            )
+# Re-scale to get percentages
+pdf['Respuestas correctas [%]'] = pdf['Respuestas correctas [%]']*100
 
-# use melt to blend columns into rows (opposite of pivot, actually)
-pdf = df.melt(id_vars=['Categoría'], value_vars=['Entrenamiento', 'Evaluación'], var_name='Etapa', value_name='Respuestas correctas [%]')
+# Compute t-test for each category. Have to use wilcoxon test and not t test, because the distribution is not normal (in fact is non-parametric --i.e: it doesnt follow a known distribution)
+test_results_size_living = wilcoxon(np.array(train_counts_size_living_correct)/total, np.array(test_counts_size_living_correct)/total)
+test_results_living = wilcoxon(np.array(train_counts_living_correct)/total, np.array(test_counts_living_correct)/total)
+test_results_size = wilcoxon(np.array(train_counts_size_correct)/total, np.array(test_counts_size_correct)/total)
 
-# use seaborn to create a violin plot where split=True
-ax = sns.violinplot(data=pdf, x="Categoría", y='Respuestas correctas [%]', hue="Etapa", split=True)
-sns.move_legend(ax, bbox_to_anchor=(.4, .15), loc='center left', frameon=False)
-plt.savefig(os.path.join('practica_1/output_experimento_1/', 'traintest.png'), dpi=600)
-plt.show(block=False)
+# The Wilcoxon signed-rank test tests the null hypothesis that two related paired samples come from the same distribution. In particular, it tests whether the distribution of the differences x - y is symmetric about zero. It is a non-parametric version of the paired T-test.
+# If pvalue<.5 we would reject the null hypothesis at a confidence level of 5%, concluding that there is a difference in height between the groups
 
-###################################3
+# Make figure
 plt.figure(tight_layout=True, figsize=(6,4))
 
-datito= np.stack(((np.array(test_counts_living_correct)/total).tolist(),(np.array(test_counts_size_correct)/total).tolist(),(np.array(test_counts_size_living_correct)/total).tolist())).T
-df = pd.DataFrame(data=datito, columns=['Vida', 'Tamaño', 'Ambas'])
-df['Evaluación'] = ['' for i in range(datito.shape[0])]
-
-# melt the dataframe to a long form
-dfm = df.melt(id_vars='Evaluación', var_name='Categorías')
-dfm=dfm.rename(columns={"value": 'Respuestas correctas [%]'})
-
-ax = sns.violinplot(data=dfm, x='Evaluación', y='Respuestas correctas [%]', hue='Categorías')
+# Use seaborn to create a violin plot where split=True, updating to percentage
+ax = sns.violinplot(
+                    data=pdf, 
+                    x='Categoría', # qué va en el eje x
+                    y='Respuestas correctas [%]', # qué va en el eje y
+                    hue='Etapa', # en qué variable se hace el split de color
+                    split=True, # If True shows the distribution just in one side
+                    palette={'Entrenamiento':'C0', 'Evaluación':'C1'},
+                    alpha=1
+                    )
+# Move the legend
 sns.move_legend(ax, bbox_to_anchor=(.4, .15), loc='center left', frameon=False)
-plt.savefig(os.path.join('practica_1/output_experimento_1/', 'categorias.png'), dpi=600)
 
+# Add annotations
+annotations = [("Vida", "Vida", test_results_living.pvalue), ("Tamaño", "Tamaño", test_results_size.pvalue), ("Ambas", "Ambas", test_results_size_living.pvalue)]
+starbars.draw_annotation(annotations=annotations, ax=ax, ns_show=False)
+
+# Save figure
 plt.show(block=False)
+plt.savefig(os.path.join('practica_1/output_experimento_1/imagenes', 'traintest.png'), dpi=600)
+
+#======================================================================================
+# Violin plot to compare distribution of response time across categories and train/test
+# Arange data according to train, test and category
+data = np.stack(((np.array(test_counts_living_correct)/total).tolist(),(np.array(test_counts_size_correct)/total).tolist(),(np.array(test_counts_size_living_correct)/total).tolist())).T
+df = pd.DataFrame(data=data, columns=['Vida', 'Tamaño', 'Ambas'])
+df['Evaluación'] = ['' for i in range(data.shape[0])]
+
+# Melt the dataframe to a long form
+dfm = df.melt(
+            id_vars='Evaluación', 
+            var_name='Categorías',
+            value_name='Respuestas correctas [%]'
+            )
+dfm['Respuestas correctas [%]'] = dfm['Respuestas correctas [%]']*100
+
+# Compute t-test across each possible combination of categories. 
+test_living_vs_size = wilcoxon(np.array(test_counts_living_correct)/total, np.array(test_counts_size_correct)/total)
+test_living_vs_size_living = wilcoxon(np.array(test_counts_living_correct)/total, np.array(test_counts_size_living_correct)/total)
+test_size_vs_size_living = wilcoxon(np.array(test_counts_size_correct)/total, np.array(test_counts_size_living_correct)/total)
+
+# Make figure
+plt.figure(tight_layout=True, figsize=(6,4))
+
+# Use seaborn to create a violin plot
+ax = sns.violinplot(
+                    data=dfm, 
+                    x='Categorías', 
+                    y='Respuestas correctas [%]', 
+                    hue='Categorías',
+                    palette={'Vida':'C0', 'Tamaño':'C1', 'Ambas':'C2'},
+                    alpha=1
+                    )
+# # Move the legend
+# sns.move_legend(ax, bbox_to_anchor=(.4, .15), loc='center left', frameon=False)
+
+# Add annotations
+annotations = [("Vida", "Tamaño", round(test_living_vs_size.pvalue,3)), ("Vida", "Ambas", round(test_living_vs_size_living.pvalue,3)), ("Tamaño", "Ambas", round(test_size_vs_size_living.pvalue,3))]
+starbars.draw_annotation(annotations=annotations, ax=ax, ns_show=True)
+
+# Save figure
+plt.show(block=False)
+plt.savefig(os.path.join('practica_1/output_experimento_1/imagenes', 'categorias.png'), dpi=600)
+
 # #=======================================================
 # # tiempo de respuesta en función de trials por categoría
 # trials_train = np.arange(30)
@@ -231,3 +285,10 @@ plt.show(block=False)
 # # #         for llave, value in zip(llaves, list_of_test):
 # # #             new_out[llave]['test'][analysis]=value
 # # #     dump_pickle(path=os.path.join('practica_1/output_experimento_1/', fail), obj=new_out, rewrite=True)
+
+
+# questionary_files = [arch for arch in os.listdir('practica_1/output_experimento_1') if 'quest' in arch]
+# for file in info_files:
+    # subj_id = re.search(pattern='([A-Z][0-9]+)', string=file).group()
+    # if subj_id in subjects_with_bis:
+#         subj_id, load_pickle(path=os.path.join('practica_1/output_experimento_1/', file))['name']
