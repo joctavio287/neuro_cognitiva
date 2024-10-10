@@ -63,23 +63,34 @@ for subject in data:
         results[subject]['test']['living']['response_time'] += data[subject][experiment]['test']['response_time(s)']
         results[subject]['train']['living']['answers'] += data[subject][experiment]['train']['answer']
         results[subject]['test']['living']['answers'] += data[subject][experiment]['test']['answer']
+    results[subject]['train']['living']['response_time'] = np.array(results[subject]['train']['living']['response_time'])
+    results[subject]['test']['living']['response_time'] = np.array(results[subject]['test']['living']['response_time'])
+    results[subject]['train']['living']['answers'] = np.array(results[subject]['train']['living']['answers'])
+    results[subject]['test']['living']['answers'] = np.array(results[subject]['test']['living']['answers'])
     for experiment in size:
         results[subject]['train']['size']['response_time'] += data[subject][experiment]['train']['response_time(s)']
         results[subject]['test']['size']['response_time'] += data[subject][experiment]['test']['response_time(s)']
         results[subject]['train']['size']['answers'] += data[subject][experiment]['train']['answer']
         results[subject]['test']['size']['answers'] += data[subject][experiment]['test']['answer']
+    results[subject]['train']['size']['response_time'] = np.array(results[subject]['train']['size']['response_time'])
+    results[subject]['test']['size']['response_time'] = np.array(results[subject]['test']['size']['response_time'])
+    results[subject]['train']['size']['answers'] = np.array(results[subject]['train']['size']['answers'])
+    results[subject]['test']['size']['answers'] = np.array(results[subject]['test']['size']['answers'])
     for experiment in size_living:
         results[subject]['train']['size_living']['response_time'] += data[subject][experiment]['train']['response_time(s)']
         results[subject]['test']['size_living']['response_time'] += data[subject][experiment]['test']['response_time(s)']
         results[subject]['train']['size_living']['answers'] += data[subject][experiment]['train']['answer']
         results[subject]['test']['size_living']['answers'] += data[subject][experiment]['test']['answer']
+    results[subject]['train']['size_living']['response_time'] = np.array(results[subject]['train']['size_living']['response_time'])
+    results[subject]['test']['size_living']['response_time'] = np.array(results[subject]['test']['size_living']['response_time'])
+    results[subject]['train']['size_living']['answers'] = np.array(results[subject]['train']['size_living']['answers'])
+    results[subject]['test']['size_living']['answers'] = np.array(results[subject]['test']['size_living']['answers'])
 
 # ======================================
 # Get relevant data in terms of subjects
 # Averages across subjects    
-def check_answer(answer:list):
+def check_answer(answer:np.ndarray):
     # check number of correct answers
-    answer = np.array(answer)
     true_answer = len(answer[answer==1])
     false_answer = len(answer[answer==0])
     return false_answer, true_answer
@@ -106,13 +117,20 @@ test_counts_size_living_incorrect = []
 
 for subj in results:
     # Removing nans
-    train_RT_living.append(np.array(results[subj]['train']['living']['response_time'])[~np.isnan(np.array(results[subj]['train']['living']['response_time']))])
-    train_RT_size.append(np.array(results[subj]['train']['size']['response_time'])[~np.isnan(np.array(results[subj]['train']['size']['response_time']))])
-    train_RT_size_living.append(np.array(results[subj]['train']['size_living']['response_time'])[~np.isnan(np.array(results[subj]['train']['size_living']['response_time']))])
-    test_RT_living.append(np.array(results[subj]['test']['living']['response_time'])[~np.isnan(np.array(results[subj]['test']['living']['response_time']))])
-    test_RT_size.append(np.array(results[subj]['test']['size']['response_time'])[~np.isnan(np.array(results[subj]['test']['size']['response_time']))])
-    test_RT_size_living.append(np.array(results[subj]['test']['size_living']['response_time'])[~np.isnan(np.array(results[subj]['test']['size_living']['response_time']))])
+    filter_liv = (~np.isnan(results[subj]['train']['living']['response_time'])&results[subj]['train']['living']['answers']==1)
+    filter_siz = (~np.isnan(results[subj]['train']['size']['response_time'])&results[subj]['train']['size']['answers']==1)
+    filter_siz_liv = (~np.isnan(results[subj]['train']['size_living']['response_time'])&results[subj]['train']['size_living']['answers']==1)
+    train_RT_living.append(results[subj]['train']['living']['response_time'][filter_liv])
+    train_RT_size.append(results[subj]['train']['size']['response_time'][filter_siz])
+    train_RT_size_living.append(results[subj]['train']['size_living']['response_time'][filter_siz_liv])
     
+    filter_liv = (~np.isnan(results[subj]['test']['living']['response_time'])&results[subj]['test']['living']['answers']==1)
+    filter_siz = (~np.isnan(results[subj]['test']['size']['response_time'])&results[subj]['test']['size']['answers']==1)
+    filter_siz_liv = (~np.isnan(results[subj]['test']['size_living']['response_time'])&results[subj]['test']['size_living']['answers']==1)
+    test_RT_living.append(results[subj]['test']['living']['response_time'][filter_liv])
+    test_RT_size.append(results[subj]['test']['size']['response_time'][filter_siz])
+    test_RT_size_living.append(results[subj]['test']['size_living']['response_time'][filter_siz_liv])
+
     train_counts_living_correct.append(check_answer(answer=results[subj]['train']['living']['answers'])[1])
     train_counts_living_incorrect.append(check_answer(answer=results[subj]['train']['living']['answers'])[0])
     train_counts_size_correct.append(check_answer(answer=results[subj]['train']['size']['answers'])[1])
@@ -130,16 +148,17 @@ for subj in results:
 #======================================================================================
 # Violin plot to compare distribution of response time across categories and train/test
 # Arange data according to train, test and category
-total = (np.array(train_counts_living_correct)+np.array(train_counts_living_incorrect))
+total = len(train_counts_living_correct+train_counts_living_incorrect)
+
 data = {
-        'Categoría': ['Vida' for i in range(len(train_counts_living_incorrect))]+['Tamaño' for i in range(len(train_counts_living_incorrect))]+['Ambas' for i in range(len(train_counts_living_incorrect))],
+        'Categorías permutadas': ['Vida' for i in range(len(train_counts_living_incorrect))]+['Tamaño' for i in range(len(train_counts_living_incorrect))]+['Ambas' for i in range(len(train_counts_living_incorrect))],
         'Entrenamiento': (np.array(train_counts_living_correct)/total).tolist()+(np.array(train_counts_size_correct)/total).tolist()+(np.array(train_counts_size_living_correct)/total).tolist(),
         'Evaluación': (np.array(test_counts_living_correct)/total).tolist()+(np.array(test_counts_size_correct)/total).tolist()+(np.array(test_counts_size_living_correct)/total).tolist()
         }
 # load into a dataframe and use melt to blend columns into rows (opposite of pivot, actually)
 df = pd.DataFrame.from_dict(data)
 pdf = df.melt(
-            id_vars=['Categoría'], 
+            id_vars=['Categorías permutadas'], 
             value_vars=['Entrenamiento', 'Evaluación'], 
             var_name='Etapa', 
             value_name='Respuestas correctas [%]'
@@ -161,7 +180,7 @@ plt.figure(tight_layout=True, figsize=(6,4))
 # Use seaborn to create a violin plot where split=True, updating to percentage
 ax = sns.violinplot(
                     data=pdf, 
-                    x='Categoría', # qué va en el eje x
+                    x='Categorías permutadas', # qué va en el eje x
                     y='Respuestas correctas [%]', # qué va en el eje y
                     hue='Etapa', # en qué variable se hace el split de color
                     split=True, # If True shows the distribution just in one side
@@ -182,22 +201,27 @@ plt.savefig(os.path.join('practica_1/output_experimento_1/imagenes', 'traintest.
 #======================================================================================
 # Violin plot to compare distribution of response time across categories and train/test
 # Arange data according to train, test and category
-data = np.stack(((np.array(test_counts_living_correct)/total).tolist(),(np.array(test_counts_size_correct)/total).tolist(),(np.array(test_counts_size_living_correct)/total).tolist())).T
+# data = np.stack(((np.array(test_counts_living_correct)/total).tolist(),(np.array(test_counts_size_correct)/total).tolist(),(np.array(test_counts_size_living_correct)/total).tolist())).T
+RT_s_l = np.array([arra.mean()*1e3 for arra in test_RT_size_living])
+RT_l = np.array([arra.mean()*1e3 for arra in test_RT_living])
+RT_s = np.array([arra.mean()*1e3 for arra in test_RT_size])
+data = np.stack((RT_l, RT_s, RT_s_l)).T
+
 df = pd.DataFrame(data=data, columns=['Vida', 'Tamaño', 'Ambas'])
 df['Evaluación'] = ['' for i in range(data.shape[0])]
 
 # Melt the dataframe to a long form
 dfm = df.melt(
             id_vars='Evaluación', 
-            var_name='Categorías',
-            value_name='Respuestas correctas [%]'
+            var_name='Categorías permutadas',
+            value_name='Tiempo de respuesta (ms)'
             )
-dfm['Respuestas correctas [%]'] = dfm['Respuestas correctas [%]']*100
+dfm['Tiempo de respuesta (ms)'] = dfm['Tiempo de respuesta (ms)']
 
 # Compute t-test across each possible combination of categories. 
-test_living_vs_size = wilcoxon(np.array(test_counts_living_correct)/total, np.array(test_counts_size_correct)/total)
-test_living_vs_size_living = wilcoxon(np.array(test_counts_living_correct)/total, np.array(test_counts_size_living_correct)/total)
-test_size_vs_size_living = wilcoxon(np.array(test_counts_size_correct)/total, np.array(test_counts_size_living_correct)/total)
+test_living_vs_size = wilcoxon(np.array(test_counts_living_correct), np.array(test_counts_size_correct))
+test_living_vs_size_living = wilcoxon(np.array(test_counts_living_correct), np.array(test_counts_size_living_correct))
+test_size_vs_size_living = wilcoxon(np.array(test_counts_size_correct), np.array(test_counts_size_living_correct))
 
 # Make figure
 plt.figure(tight_layout=True, figsize=(6,4))
@@ -205,9 +229,9 @@ plt.figure(tight_layout=True, figsize=(6,4))
 # Use seaborn to create a violin plot
 ax = sns.violinplot(
                     data=dfm, 
-                    x='Categorías', 
-                    y='Respuestas correctas [%]', 
-                    hue='Categorías',
+                    x='Categorías permutadas', 
+                    y='Tiempo de respuesta (ms)', 
+                    hue='Categorías permutadas',
                     palette={'Vida':'C0', 'Tamaño':'C1', 'Ambas':'C2'},
                     alpha=1
                     )
