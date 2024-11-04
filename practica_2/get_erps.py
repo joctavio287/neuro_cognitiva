@@ -11,7 +11,7 @@ params = {'legend.fontsize': 'x-large',
 pylab.rcParams.update(params)
 
 # Modules
-from practica_2.auxiliary import dump_pickle, load_pickle
+from auxiliary import dump_pickle, load_pickle
 
 # Specific libraries
 import mne

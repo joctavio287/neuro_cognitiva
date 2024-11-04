@@ -8,7 +8,7 @@ from mne.io import read_raw
 from mne import set_bipolar_reference, Epochs, events_from_annotations, merge_events
 
 # Modules
-from practica_2.auxiliary import dump_pickle, load_pickle
+from auxiliary import dump_pickle, load_pickle
 
 # Get data from experiment 
 experiment_tagg = 'LRP' # N170, MMN, N2pc, N400, P3, ERN
